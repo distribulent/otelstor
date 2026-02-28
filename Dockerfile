@@ -27,6 +27,7 @@ COPY --from=build-stage /app/testclient  /testclient
 COPY --from=build-stage /app/oteldash    /oteldash
 
 EXPOSE 4137/tcp
+EXPOSE 4138/tcp
 EXPOSE 10731/tcp
 
 # Run our app by directly executing the binary
