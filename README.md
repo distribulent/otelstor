@@ -1,3 +1,5 @@
+![oteldash](https://github.com/distribulent/otelstor/blob/main/media/oteldash.png?raw=true)
+
 # otelstor
 
 A lightweight OpenTelemetry trace collector and storage backend. Receives spans over OTLP (gRPC and HTTP/protobuf), stores them in a local [bbolt](https://github.com/etcd-io/bbolt) database, and exposes a gRPC stats API and a Svelte web dashboard.
