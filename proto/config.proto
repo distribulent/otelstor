@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package otelstor;
+
+option go_package = "./proto";
+
+message ServerConfig {
+    int32  port            = 1; // gRPC port, default 4317
+    string data_dir        = 2; // directory for traces.db, default "."
+    int32  retention_days  = 3; // trace retention in days, default 60
+    int32  http_port       = 4; // OTLP HTTP/protobuf port, default 4318 (0 to disable)
+}

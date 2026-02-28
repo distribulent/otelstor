@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+package otelstor;
+
+option go_package = "./proto";
+
+import "proto/config.proto";
+
+service StatsService {
+    rpc GetStats(StatsRequest) returns (StatsResponse);
+    rpc GetSpans(GetSpansRequest) returns (GetSpansResponse);
+    rpc GetSpanTree(GetSpanTreeRequest) returns (GetSpanTreeResponse);
+    rpc DeleteService(DeleteServiceRequest) returns (DeleteServiceResponse);
+    rpc GetTraceIDs(GetTraceIDsRequest) returns (GetTraceIDsResponse);
+    rpc ListServices(ListServicesRequest) returns (ListServicesResponse);
+    rpc GetTraceByID(GetTraceByIDRequest) returns (GetSpanTreeResponse);
+}
+
+message StatsRequest {}
+
+message StatsResponse {
+    ServerConfig config   = 1; // effective configuration (defaults resolved)
+    repeated ServiceBucket services = 2;
+}
+
+// ServiceBucket represents one top-level bbolt bucket (one per service name).
+message ServiceBucket {
+    string name                  = 1;
+    repeated MonthBucket months  = 2;
+}
+
+// MonthBucket represents one nested bbolt bucket (one per YYYY-MM).
+message MonthBucket {
+    string month      = 1; // YYYY-MM
+    int64 span_count  = 2; // number of span entries in this bucket
+}
+
+message GetSpansRequest {
+    string service = 1;
+    int32 limit    = 2; // max entries to return; 0 defaults to 50
+}
+
+message SpanEntry {
+    string trace_id             = 1; // hex-encoded
+    string span_id              = 2; // hex-encoded
+    string name                 = 3;
+    string month                = 4; // YYYY-MM bucket the entry lives in
+    int64  start_time_unix_nano = 5;
+    int64  end_time_unix_nano   = 6;
+    int32  status_code          = 7;
+    string parent_span_id       = 8; // hex-encoded; empty for root spans
+    bytes  span_proto           = 9; // serialized opentelemetry.proto.trace.v1.Span
+}
+
+message GetSpansResponse {
+    string service           = 1;
+    repeated SpanEntry spans = 2;
+}
+
+message GetSpanTreeRequest {
+    string span_id = 1; // hex-encoded span_id of any span in the trace
+}
+
+message GetTraceByIDRequest {
+    string trace_id = 1; // hex-encoded trace ID to look up
+}
+
+// GetSpanTreeResponse contains all spans that share the same trace_id as the
+// requested span and whose start time falls within ±2 minutes of that span.
+message GetSpanTreeResponse {
+    string trace_id          = 1;
+    repeated SpanEntry spans = 2;
+}
+
+message DeleteServiceRequest {
+    string service = 1; // service name to delete
+}
+
+message DeleteServiceResponse {}
+
+message GetTraceIDsRequest {
+    string service = 1;
+    int32  limit   = 2; // max trace IDs to return; 0 defaults to 100
+}
+
+message GetTraceIDsResponse {
+    string service            = 1;
+    repeated string trace_ids = 2; // hex-encoded trace IDs, newest first
+}
+
+message ListServicesRequest {}
+
+// ServiceSummary holds per-service aggregate statistics.
+message ServiceSummary {
+    string name                   = 1;
+    int64  trace_count            = 2; // distinct trace IDs across all stored spans
+    int64  span_count             = 3; // total stored spans
+    int64  last_updated_unix_nano = 4; // start time of the most recently stored span
+}
+
+message ListServicesResponse {
+    repeated ServiceSummary services = 1;
+}

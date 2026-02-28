@@ -1,0 +1,2 @@
+- Font Title: Fira Sans Extra Condensed
+- Font Source: https://fonts.gstatic.com/s/firasansextracondensed/v10/NaPKcYDaAO5dirw6IaFn7lPJFqXmS-M9Atn3wgda5fiku3efvE8.ttf
