@@ -10,14 +10,15 @@ A lightweight OpenTelemetry trace collector and storage backend. Receives spans 
 # Build the server
 go build -o otelstor .
 
-# Build the dashboard bridge
-go build -o dashboard ./cmd/dashboard
-
 # Build the test client
 go build -o testclient ./cmd/testclient
 
 # Build the Svelte UI (requires Node.js)
 cd cmd/dashboard/ui && npm install && npm run build
+
+# Build the dashboard bridge
+go build -o dashboard ./cmd/dashboard
+
 ```
 
 ## Running the server
